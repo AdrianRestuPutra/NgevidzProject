@@ -1,0 +1,11 @@
+{
+  "name": "ngevidz",
+  "version": "1.0.0",
+  "description": "ngevidz is a web that contains Indonesian channel only on Youtube",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adrian Restu <adrian.restup@gmail.com>",
+  "license": "Apache-2.0"
+}
