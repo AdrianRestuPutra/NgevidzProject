@@ -88,15 +88,27 @@
 
         <script src="bower_components/bootstrap-material-design/dist/js/ripples.min.js"></script>
         <script src="bower_components/bootstrap-material-design/dist/js/material.min.js"></script>
+        <script src="https://parse.com/downloads/javascript/parse-1.5.0.js"></script>
         <script>
             $(document).ready(function() {
                 // This command is used to initialize some elements and make them work properly
+				Parse.initialize("7S74T8KnWfrCzhqjRV9o4SRzPiAEqZIlNs20V5XS", "692AZ4EzeRT9M3viACOY0peVbj58XKIVvXATgYnQ");
                 $.material.init();
             });
+			
+			/**
+			 * Returns a random integer between min (inclusive) and max (inclusive)
+			 * Using Math.round() will give you a non-uniform distribution!
+			 */
+			function getRandomInt(min, max) {
+				return Math.floor(Math.random() * (max - min + 1)) + min;
+			}
         </script>
         
         <!--Youtube Script-->
         <script>
+		  var NEXT_VIDEO = "";
+		
           // 2. This code loads the IFrame Player API code asynchronously.
           var tag = document.createElement('script');
 
@@ -111,18 +123,18 @@
             player = new YT.Player('player', {
               height: '390',
               width: '640',
-              videoId: 'M7lc1UVf-VE',
+              videoId: 'QqOT97TotBc',
               events: {
                 'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange
               }
             });
-              
           }
 
           // 4. The API will call this function when the video player is ready.
           function onPlayerReady(event) {
             event.target.playVideo();
+			RetrievedRandomVideo();
           }
 
           // 5. The API calls this function when the player's state changes.
@@ -130,11 +142,12 @@
           //    the player should play for six seconds and then stop.
           var done = false;
           function onPlayerStateChange(event) {
-            if (event.data == YT.PlayerState.PLAYING && !done) {
-              setTimeout(stopVideo, 6000);
-              done = true;
+            if (event.data == YT.PlayerState.ENDED) {
+              player.loadVideoById(NEXT_VIDEO, 0, "medium");
+			  RetrievedRandomVideo();
             }
           }
+		  
           function stopVideo() {
             player.stopVideo();
           }
@@ -146,6 +159,36 @@
             return false;
           }*/
         </script>
+		
+		<script>
+		// ANYTHING FROM PARSE SCRIPT
+		function RetrievedRandomVideo() {
+			var dataInfo = Parse.Object.extend("Data_Information");
+			var queryData = new Parse.Query(dataInfo);
+			queryData.first({
+			  success: function(object) {
+				// Successfully retrieved the object.
+				var youtubeVideo = Parse.Object.extend("Youtube_Video");
+				var queryVideo = new Parse.Query(youtubeVideo);
+				var dataCount = object.get('Data_Count');
+				queryVideo.skip(getRandomInt(0, dataCount - 1));
+				queryVideo.first({
+				  success: function(object) {
+					// Successfully retrieved the object.
+					NEXT_VIDEO = object.get("VideoID");
+				  },
+				  error: function(error) {
+					alert("Error: " + error.code + " " + error.message);
+				  }
+				});
+			  },
+			  error: function(error) {
+				alert("Error: " + error.code + " " + error.message);
+			  }
+			});
+		}
+		
+		</script>
     </body>
 
 </html>
